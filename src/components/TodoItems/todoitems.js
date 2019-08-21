@@ -1,13 +1,12 @@
 import React, { Component } from 'react';
-import { Card, FormGroup, Divider, FormControlLabel, Switch, Tooltip, IconButton, Fab } from '@material-ui/core';
+import { Card, FormGroup, Divider, FormControlLabel, Switch, Tooltip, IconButton } from '@material-ui/core';
 
 import DeleteIcon from '@material-ui/icons/Delete';
 import EditIcon from '@material-ui/icons/Edit';
 
 
 const styles = {
-    done: {
-        textDecoration: "line-through",
+    done: {        
         opacity: ".5",
         display: "flex",
         width: "100%"
@@ -81,7 +80,7 @@ class TodoItems extends Component {
                             <Tooltip title="Delete task" placement="top">
                                 <IconButton
                                     aria-label="delete"
-                                    onClick={() => this.props.deleteTask(this.props.data)}
+                                    onClick={() => this.props.deleteTask(this.props.data)}                                    
                                 >
                                     <DeleteIcon className='icon' />
                                 </IconButton>

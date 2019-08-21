@@ -1,13 +1,9 @@
 import React, { Component } from 'react';
-import { TextField, Button, CircularProgress } from '@material-ui/core';
-import { getTasks, addTask } from '../../actions/todo_actions';
+import { TextField, Button, CircularProgress, ButtonGroup } from '@material-ui/core';
+import { getTasks, addTask, updateTask } from '../../actions/todo_actions';
 import { connect } from 'react-redux';
 import TodoItems from './todoitems';
-import { green } from '@material-ui/core/colors';
 const styles = {
-    root:{
-
-    },    
     done: {
         textDecoration: "line-through",
         opacity: ".5",
@@ -52,7 +48,9 @@ class AddToDo extends Component {
         tasks: [],
         newTask: "",
         loading: false,
-        editTask: false
+        editTask: false,
+        editId: null,
+        editedData: null
     };
 
     componentDidMount() {
@@ -72,13 +70,31 @@ class AddToDo extends Component {
     };
 
     addTask = () => {
-        let { newTask } = this.state;
-        this.props.dispatch(addTask(newTask,this.props.todos.todos)).then(response=>{            
-            this.setState({
-                tasks: this.props.todos.todos,
-                newTask:''
-            })
-        });
+        if (!this.state.editTask) {
+            let { newTask } = this.state;
+            this.props.dispatch(addTask(newTask, this.props.todos.todos)).then(response => {
+                this.setState({
+                    tasks: this.props.todos.todos,
+                    newTask: ''
+                })
+            });
+        } else {
+
+            const selectedTask = this.state.editedData;
+
+            selectedTask.title = this.state.newTask;
+
+            this.props.dispatch(updateTask(selectedTask, this.state.tasks)).then(response => {
+                this.setState({
+                    tasks: this.props.todos.todos,
+                    newTask: '',
+                    editId: null,
+                    editTask: false,
+                    editedData: null
+                })
+            });
+
+        }
     };
     toggle = task => {
         let { tasks } = this.state;
@@ -91,39 +107,54 @@ class AddToDo extends Component {
         this.setState({ tasks: tasks, newTask: "" });
     };
 
+    deleteCompleted = () => {
+        const completedTasks = this.state.tasks.filter(task => task.completed === true);
+
+        let { tasks } = this.state;
+        
+        completedTasks.forEach(element => {
+            tasks.splice(tasks.indexOf(element), 1);
+        });        
+        this.setState({ tasks: tasks, newTask: "" });
+    }
+    deleteAll =()=>{
+        let { tasks } = this.state;
+        tasks.splice(0, tasks.length);
+        this.setState({ tasks: tasks, newTask: "" });
+    }
     handleEditTask = id => {
-        const filteredTasks = this.state.tasks.filter(task=>
+        const filteredTasks = this.state.tasks.filter(task =>
             task.id !== id);
-        const selectedTask = this.state.tasks.filter(task=>
+        const selectedTask = this.state.tasks.filter(task =>
             task.id === id);
-            console.log(selectedTask[0]);
+
         this.setState({
             tasks: filteredTasks,
             newTask: selectedTask[0].title,
-            editTask : true
-        })
-        
-    };
+            editTask: true,
+            editId: id,
+            editedData: selectedTask[0]
+        });
 
+    };
     render() {
-        const { newTask } = this.state;
-        const { todos } = this.props;       
+        const { newTask } = this.state;        
         return (
             <div id="main" style={styles.main}>
                 <header style={styles.header}>
                     <TextField
-                        label="Add new task"
+                        label={this.state.editTask ? "Edit task" : "Add new task"}
                         value={newTask}
                         onChange={this.onTextUpdate}
                     />
                     <Button
-                        variant="contained"  
-                        color= {this.state.editTask ? "secondary" :"primary" }                     
+                        variant="contained"
+                        color={this.state.editTask ? "secondary" : "primary"}
                         disabled={!newTask}
-                        onClick={this.addTask}                                                
+                        onClick={this.addTask}
                     >
-                        {this.state.editTask ? 'Edit' :'Add'}
-          </Button>
+                        {this.state.editTask ? 'Edit' : 'Add'}
+                    </Button>
                 </header>
                 {
                     this.state.loading ?
@@ -134,20 +165,28 @@ class AddToDo extends Component {
                             style={{ marginTop: '30px' }}
                         />
                         : null
-                }              
+                }
                 {this.state.tasks ?
                     this.state.tasks.map(data =>
                         <TodoItems
+                        key={data.id}
                             data={data}
                             onTextUpdate={this.onTextUpdate}
                             toggle={this.toggle}
                             deleteTask={this.deleteTask}
-                            handleEditTask = {this.handleEditTask}                            
+                            handleEditTask={this.handleEditTask}
                         />
                     )
                     : null
                 }
-
+                {
+                    this.state.tasks.length >0 ?
+                        <ButtonGroup fullWidth >
+                            <Button style={{ backgroundColor: '#ffc107', margin: '3px' }} onClick={this.deleteCompleted}>Clear Completed</Button>
+                            <Button style={{ backgroundColor: '#dc3545', margin: '3px' }} onClick={this.deleteAll}>Clear All</Button>
+                        </ButtonGroup>
+                        : null
+                }
             </div>
         );
     }
