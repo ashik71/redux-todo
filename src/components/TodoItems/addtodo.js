@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { TextField, Button, CircularProgress, ButtonGroup } from '@material-ui/core';
-import { getTasks, addTask, updateTask } from '../../actions/todo_actions';
+import { getTasks, addTask, updateTask,deleteTask } from '../../actions/todo_actions';
 import { connect } from 'react-redux';
 import TodoItems from './todoitems';
 const styles = {
@@ -102,9 +102,15 @@ class AddToDo extends Component {
         this.setState({ tasks: tasks, newTask: "" });
     };
     deleteTask = task => {
-        let { tasks } = this.state;
-        tasks.splice(tasks.indexOf(task), 1);
-        this.setState({ tasks: tasks, newTask: "" });
+        this.props.dispatch(deleteTask(task.id,this.props.todos.todos)).then(response => {
+            this.setState({
+                tasks: this.props.todos.todos,
+                newTask: ''
+            })
+        });
+        // let { tasks } = this.state;
+        // tasks.splice(tasks.indexOf(task), 1);
+        // this.setState({ tasks: tasks, newTask: "" });
     };
 
     deleteCompleted = () => {

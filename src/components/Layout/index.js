@@ -28,7 +28,7 @@ const Layout = (props) => {
         >
             <AppBar color="primary" position="static" style={{ height: 64 }} className={classes.appbar}>
                 <Toolbar style={{ height: 64, textAlign:"center" }}>
-                    <Typography color="inherit">Redux Todo-list</Typography>
+                    <Typography color="inherit">Redux To-Do</Typography>
                 </Toolbar>
             </AppBar>            
         </Paper>

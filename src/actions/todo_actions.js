@@ -1,8 +1,10 @@
 import {
     ADD_TASK,
     GET_TASK,
-    UPDATE_TASK    
+    UPDATE_TASK,
+    DELETE_TASK  
 } from './types';
+
 
 import axios from 'axios';
 
@@ -60,6 +62,28 @@ export function updateTask(dataToSubmit, previousTasks) {
                 dispatch(
                     {
                         type: UPDATE_TASK,
+                        payload: todos
+                    }
+                )
+            })
+            .catch(error => {
+                throw (error);
+            });
+    };
+
+}
+
+
+export function deleteTask(id, previousTasks) {
+    return (dispatch) => {
+        return axios.delete(`${JSON_SERVER}/${id}`)
+            .then(response => {
+                const filteredTasks = previousTasks.filter(task =>
+                    task.id !== id);
+                let todos = filteredTasks;
+                dispatch(
+                    {
+                        type: DELETE_TASK,
                         payload: todos
                     }
                 )
